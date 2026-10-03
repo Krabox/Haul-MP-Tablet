@@ -1,63 +1,29 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
-
-export type JobStatus = 'created' | 'assigned' | 'accepted' | 'in_progress' | 'delivered' | 'cancelled' | 'failed';
-
-export class CreateJobDto {
-  playerId: string;
-  cargoType: string;
-  originCity: string;
-  destinationCity: string;
-  cargoWeight: number;
-  distanceKm: number;
-  reward: number;
-  trailerType: string;
-  dlcId?: string;
-  role?: 'driver' | 'escort' | 'support';
-}
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { CreateJobDto, JobStatus, JobsService } from './jobs.service';
 
 @Controller('jobs')
 export class JobsController {
+  constructor(private readonly jobsService: JobsService) {}
+
   @Get()
   getJobs(@Query('status') status?: JobStatus) {
-    return {
-      jobs: [
-        {
-          id: 'job_001',
-          playerId: 'player_001',
-          cargoType: 'Building materials',
-          originCity: 'Berlin',
-          destinationCity: 'Hamburg',
-          cargoWeight: 18000,
-          distanceKm: 410,
-          reward: 2800,
-          trailerType: 'flatbed',
-          dlcId: 'dlc_01',
-          status: status ?? 'assigned',
-        },
-      ],
-    };
-  }
-
-  @Post()
-  createJob(@Body() payload: CreateJobDto) {
-    return {
-      message: 'Job created',
-      job: {
-        id: 'job_new_001',
-        ...payload,
-        status: 'created',
-      },
-    };
+    return { jobs: this.jobsService.findAll(status) };
   }
 
   @Get(':id')
   getJobById(@Param('id') id: string) {
-    return {
-      id,
-      cargoType: 'Heavy cargo',
-      originCity: 'Dresden',
-      destinationCity: 'Munich',
-      status: 'in_progress',
-    };
+    const job = this.jobsService.findById(id);
+    return job ?? { message: 'Job not found' };
+  }
+
+  @Post()
+  createJob(@Body() payload: CreateJobDto) {
+    return { message: 'Job created', job: this.jobsService.create(payload) };
+  }
+
+  @Patch(':id/status')
+  updateStatus(@Param('id') id: string, @Body('status') status: JobStatus) {
+    const job = this.jobsService.updateStatus(id, status);
+    return job ? { message: 'Status updated', job } : { message: 'Job not found' };
   }
 }

@@ -1,28 +1,27 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { PlayersService } from './players.service';
 
 @Controller('players')
 export class PlayersController {
+  constructor(private readonly playersService: PlayersService) {}
+
   @Get()
   getPlayers() {
-    return {
-      players: [
-        {
-          id: 'player_001',
-          username: 'Krabox',
-          vtcId: 'vtc_001',
-          online: true,
-          currentCity: 'Berlin',
-          truckModel: 'Volvo FH',
-        },
-        {
-          id: 'player_002',
-          username: 'Dreiklang',
-          vtcId: 'vtc_002',
-          online: true,
-          currentCity: 'Hamburg',
-          truckModel: 'Scania R',
-        },
-      ],
-    };
+    return { players: this.playersService.findAll() };
+  }
+
+  @Get(':id')
+  getPlayerById(@Param('id') id: string) {
+    return this.playersService.findById(id);
+  }
+
+  @Patch(':id/status')
+  updateStatus(@Param('id') id: string, @Body('online') online: boolean) {
+    return this.playersService.updateStatus(id, online);
+  }
+
+  @Post()
+  createPlayer(@Body() payload: any) {
+    return { message: 'Player created', player: payload };
   }
 }

@@ -1,19 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
+import { VtcService } from './vtc.service';
 
 @Controller('vtc')
 export class VtcController {
+  constructor(private readonly vtcService: VtcService) {}
+
   @Get()
   getVtcs() {
-    return {
-      vtcs: [
-        {
-          id: 'vtc_001',
-          name: 'Eiffel Express',
-          tag: 'EE',
-          members: 26,
-          activeJobs: 18,
-        },
-      ],
-    };
+    return { vtcs: this.vtcService.findAll() };
+  }
+
+  @Get(':id')
+  getVtcById(@Param('id') id: string) {
+    return this.vtcService.findById(id);
   }
 }
