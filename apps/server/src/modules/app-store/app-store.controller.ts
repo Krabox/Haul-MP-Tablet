@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { AppStoreService } from './app-store.service';
 
 @Controller('apps')
@@ -8,5 +8,10 @@ export class AppStoreController {
   @Get('catalog')
   getCatalog() {
     return { apps: this.appStoreService.findAll() };
+  }
+
+  @Get(':id')
+  getAppById(@Param('id') id: string) {
+    return this.appStoreService.findById(id);
   }
 }

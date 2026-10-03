@@ -5,6 +5,8 @@ import { VtcModule } from './modules/vtc/vtc.module';
 import { MapModule } from './modules/map/map.module';
 import { RadioModule } from './modules/radio/radio.module';
 import { AppStoreModule } from './modules/app-store/app-store.module';
+import { TelemetryModule } from './modules/telemetry/telemetry.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { AppStoreModule } from './modules/app-store/app-store.module';
     MapModule,
     RadioModule,
     AppStoreModule,
+    TelemetryModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

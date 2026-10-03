@@ -1,7 +1,7 @@
-import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { HaulMPSyncService } from './services/haulmp-sync.service';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -18,9 +18,18 @@ async function bootstrap() {
     }),
   );
 
+  // Initialize Haul MP Sync Service
+  const syncService = app.get(HaulMPSyncService);
+  try {
+    await syncService.initializeServer('Haul MP Tablet Server', 256);
+    console.log('[Bootstrap] Haul MP integration initialized');
+  } catch (error) {
+    console.warn('[Bootstrap] Haul MP integration failed, running in standalone mode');
+  }
+
   const port = Number(process.env.PORT ?? 3000);
   await app.listen(port);
-  console.log(`Haul MP server running on http://localhost:${port}`);
+  console.log(`[Bootstrap] Server running on http://localhost:${port}`);
 }
 
 bootstrap();
